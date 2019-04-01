@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import SearchHeader from "./components/SearchHeader";
-import { Provider } from "./components/SearchContext";
-import SearchResults from "./components/SearchResults";
+import SearchHeader from "./components/SearchHeader/SearchHeader";
+import { Provider } from "./components/SearchContext/SearchContext";
+import SearchResults from "./components/SearchResults/SearchResults";
 
 class App extends Component {
   constructor(props) {
@@ -10,25 +10,23 @@ class App extends Component {
       name: "",
       position: "",
       age: "",
-      results: [],
-      handleNameChange: this.handleNameChange,
-      handlePositionChange: this.handlePositionChange,
-      handleAgeChange: this.handleAgeChange,
-      searchAction: this.searchAction
+      results: []
     };
   }
 
-  getAge(DOB) {
-    var today = new Date();
-    var birthDate = new Date(DOB);
-    var age = today.getFullYear() - birthDate.getFullYear();
-    var m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+  getAge = date => {
+    let today = new Date();
+    let birthDate = new Date(date);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    let deltaMonth = today.getMonth() - birthDate.getMonth();
+    if (
+      deltaMonth < 0 ||
+      (deltaMonth === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age = age - 1;
     }
-
     return age;
-  }
+  };
 
   handleNameChange = event => {
     this.setState({
@@ -48,16 +46,24 @@ class App extends Component {
     });
   };
 
-  searchAction = ddbb => {
-    const db = ddbb.players();
+  handleChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value
+    });
+  };
+
+  searchAction = dataBase => {
+    const playerDataBase = dataBase.players();
     let results;
     let callback;
-    if (this.state.position)
-      callback = db
+    if (this.state.position) {
+      callback = playerDataBase
         .orderByChild("position")
         .equalTo(this.state.position)
         .once("value");
-    else callback = db.orderByChild("name").once("value");
+    } else {
+      callback = playerDataBase.orderByChild("name").once("value");
+    }
     let myThis = this;
     callback.then(function(snapshot) {
       results = Object.values(snapshot.val());
@@ -65,7 +71,6 @@ class App extends Component {
       myThis.setState({
         results: results
       });
-
       if (myThis.state.name) {
         myThis.setState({
           results: myThis.state.results.filter(result => {
@@ -87,8 +92,10 @@ class App extends Component {
   render() {
     return (
       <Provider value={this.state}>
-        <SearchHeader />
-
+        <SearchHeader
+          changeHandler={this.handleChange}
+          searchAction={this.searchAction}
+        />
         <SearchResults results={this.state.results} />
       </Provider>
     );

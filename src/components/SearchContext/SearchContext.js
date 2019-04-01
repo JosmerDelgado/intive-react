@@ -1,13 +1,9 @@
 import React from "react";
 
 const SearchContext = React.createContext({
-  name: "Josmer",
+  name: "",
   position: "",
-  age: "28",
-  handleNameChange() {},
-  handlePositionChange() {},
-  handleAgeChange() {},
-  searchAction(ddbb) {}
+  age: ""
 });
 
 export const Provider = SearchContext.Provider;
