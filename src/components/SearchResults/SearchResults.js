@@ -1,6 +1,7 @@
 import React from "react";
 import SearchRow from "./SearchRow";
 import "./index.css";
+import { connect } from "react-redux";
 
 const withoutResultMessage = "Select your search criteria";
 const titleNameColumn = "Name";
@@ -26,4 +27,6 @@ const SearchResults = props => {
   );
 };
 
-export default SearchResults;
+const mapStateToProps = ({ results }) => ({ results });
+
+export default connect(mapStateToProps)(SearchResults);

@@ -1,7 +1,11 @@
 import React from "react";
 import "./index.css";
 import { FirebaseContext } from "../Firebase";
-import { Consumer } from "../SearchContext/SearchContext";
+import { connect } from "react-redux";
+import changeName from "../../actionCreators/changeName";
+import changePosition from "../../actionCreators/changePosition";
+import changeAge from "../../actionCreators/changeAge";
+import searchAction from "../../actionCreators/searchAction";
 
 const positionArray = [
   "Attacking Midfield",
@@ -20,51 +24,65 @@ const topTitle = "Football Player Finder";
 
 const SearchHeader = props => {
   return (
-    <Consumer>
-      {context => (
-        <React.Fragment>
-          <h1> {topTitle}</h1>
+    <React.Fragment>
+      <h1> {topTitle}</h1>
 
-          <input
-            value={context.name}
-            name="name"
-            placeholder="Player Name"
-            onChange={props.changeHandler}
-          />
-          <select
-            onChange={props.changeHandler}
-            value={context.position}
-            name="position"
-          >
-            <option value="">Position</option>
-            {positionArray.map((position, key) => (
-              <option key={`sl${key}`} value={position}>
-                {position}
-              </option>
-            ))}
-          </select>
-          <input
-            placeholder="Age"
-            type="number"
-            min="18"
-            max="40"
-            name="age"
-            value={context.age}
-            onChange={props.changeHandler}
-          />
-          <FirebaseContext.Consumer>
-            {firebase => {
-              return (
-                <button onClick={() => props.searchAction(firebase)}>
-                  Search
-                </button>
-              );
-            }}
-          </FirebaseContext.Consumer>
-        </React.Fragment>
-      )}
-    </Consumer>
+      <input
+        value={props.name}
+        name="name"
+        placeholder="Player Name"
+        onChange={props.handleNameChange}
+      />
+      <select
+        onChange={props.handlePositionChange}
+        value={props.position}
+        name="position"
+      >
+        <option value="">Position</option>
+        {positionArray.map((position, key) => (
+          <option key={`sl${key}`} value={position}>
+            {position}
+          </option>
+        ))}
+      </select>
+      <input
+        placeholder="Age"
+        type="number"
+        min="18"
+        max="40"
+        name="age"
+        value={props.age}
+        onChange={props.handleAgeChange}
+      />
+      <FirebaseContext.Consumer>
+        {firebase => {
+          return (
+            <button onClick={() => props.searchAction(firebase)}>Search</button>
+          );
+        }}
+      </FirebaseContext.Consumer>
+    </React.Fragment>
   );
 };
 
-export default SearchHeader;
+const mapStateToProps = ({ position, name, age }) => ({ position, name, age });
+
+const mapDispatchToProps = dispatch => ({
+  handleNameChange(event) {
+    dispatch(changeName(event.target.value));
+  },
+  handlePositionChange(event) {
+    dispatch(changePosition(event.target.value));
+  },
+  handleAgeChange(event) {
+    dispatch(changeAge(event.target.value));
+  },
+  searchAction(database) {
+    dispatch(searchAction(database));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SearchHeader);
