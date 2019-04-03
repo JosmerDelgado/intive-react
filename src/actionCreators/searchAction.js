@@ -30,25 +30,20 @@ export default dataBase => {
     callback.then(function(snapshot) {
       results = Object.values(snapshot.val());
       console.log(results);
-      dispatch({ type: "CHANGE_RESULTS", payload: results });
 
       if (name) {
-        dispatch({
-          type: "CHANGE_RESULTS",
-          payload: results.filter(result => {
-            return result.name.includes(name);
-          })
+        results = results.filter(result => {
+          return result.name.includes(name);
         });
       }
 
       if (age) {
-        dispatch({
-          type: "CHANGE_RESULTS",
-          payload: results.filter(result => {
-            return +age === getAge(result.dateOfBirth);
-          })
+        results = results.filter(result => {
+          return +age === getAge(result.dateOfBirth);
         });
       }
+
+      dispatch({ type: "CHANGE_RESULTS", payload: results });
     });
   };
 };
